@@ -18,7 +18,7 @@
     </button>
 
     <h1 class="flex-1 text-center font-extrabold tracking-wide text-[15px]">
-      JABU MARKET yo
+      JABU MARKET yoo
     </h1>
 
     <button
