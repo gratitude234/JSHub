@@ -12,14 +12,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node 20
+      - name: Use Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20  # if you still see issues, try 18
           cache: 'npm'
 
-      - name: Install deps
-        run: npm ci
+      # 🔧 Workaround: rebuild dependency tree on Linux
+      - name: Install deps (regenerate lockfile)
+        run: |
+          rm -f package-lock.json
+          rm -rf node_modules
+          npm i
 
       - name: Build
         run: npm run build
@@ -32,7 +36,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           local-dir: dist/
-          server-dir: public_html/   # change if your docroot is different
+          server-dir: public_html/
           log-level: standard
           exclude: |
             logs/**
