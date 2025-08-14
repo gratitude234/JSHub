@@ -12,23 +12,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node 20
+      - name: Use Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      # Install respecting your package-lock.json + optional deps (rollup sometimes needs them)
-      - name: Install deps (npm)
+      # Install dependencies based on package-lock.json
+      - name: Install deps
         run: npm ci --include=optional
 
-      # If your build is large, uncomment the next line to avoid OOM issues
-      # - run: echo "NODE_OPTIONS=--max_old_space_size=4096" >> $GITHUB_ENV
+      # WORKAROUND: install Rollup’s Linux binary so Vite can find it
+      - name: Install rollup-linux-x64-gnu
+        run: npm install @rollup/rollup-linux-x64-gnu --no-save
 
-      # Ensure you have "build": "vite build" (or your framework's build) in package.json
+      # Build the Vite app
       - name: Build
         run: npm run build
 
+      # Deploy over FTP
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -37,7 +39,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           local-dir: dist/
-          server-dir: public_html/   # change if your docroot is different
+          server-dir: public_html/
           log-level: standard
           exclude: |
             logs/**
