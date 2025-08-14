@@ -2,7 +2,7 @@ name: Build & Deploy to Truehost
 
 on:
   push:
-    branches: [ main ]   # ← change if you deploy from another branch
+    branches: [ main ]
 
 jobs:
   build-and-deploy:
@@ -16,30 +16,35 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'         # 'yarn' or 'pnpm' if you use those
+          cache: 'npm'
 
-      - name: Install deps
-        run: npm ci            # or: npm i  (if package-lock.json is missing)
+      # Install respecting your package-lock.json + optional deps (rollup sometimes needs them)
+      - name: Install deps (npm)
+        run: npm ci --include=optional
 
-      # If using Vite + Vue Router history mode and the app is in a subfolder,
-      # set base path before building, or configure vite.config.js accordingly.
-      # - name: Set VITE_BASE for subfolder deploy
-      #   run: echo "VITE_BASE=/your-subfolder/" >> $GITHUB_ENV
+      # If your build is large, uncomment the next line to avoid OOM issues
+      # - run: echo "NODE_OPTIONS=--max_old_space_size=4096" >> $GITHUB_ENV
 
+      # Ensure you have "build": "vite build" (or your framework's build) in package.json
       - name: Build
-        env:
-          # Pass any runtime build envs here if you use them (Vite uses VITE_*).
-          # VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: npm run build
 
-      # Upload /dist to Truehost via FTPS (secure FTP)
       - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps             # or 'ftp' if FTPS isn’t enabled
-          local-dir: dist/           # change if your build outputs elsewhere
-          server-dir: public_html/   # change to your exact docroot/subfolder
+          protocol: ftps
+          local-dir: dist/
+          server-dir: public_html/   # change if your docroot is different
           log-level: standard
+          exclude: |
+            logs/**
+            backups/**
+            tmp/**
+            cgi-bin/**
+            api/**
+            vendor/**
+            composer.json
+            composer.lock
