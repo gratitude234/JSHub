@@ -15,22 +15,19 @@ jobs:
       - name: Use Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20  # if you still see issues, try 18
           cache: 'npm'
 
-      # Install dependencies based on package-lock.json
-      - name: Install deps
-        run: npm ci --include=optional
+      # 🔧 Workaround: rebuild dependency tree on Linux
+      - name: Install deps (regenerate lockfile)
+        run: |
+          rm -f package-lock.json
+          rm -rf node_modules
+          npm i
 
-      # WORKAROUND: install Rollup’s Linux binary so Vite can find it
-      - name: Install rollup-linux-x64-gnu
-        run: npm install @rollup/rollup-linux-x64-gnu --no-save
-
-      # Build the Vite app
       - name: Build
         run: npm run build
 
-      # Deploy over FTP
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
