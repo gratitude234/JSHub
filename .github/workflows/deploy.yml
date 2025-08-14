@@ -12,18 +12,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node
+      - name: Use Node 18 (npm 9)
         uses: actions/setup-node@v4
         with:
-          node-version: 20  # if you still see issues, try 18
+          node-version: 18
           cache: 'npm'
 
-      # 🔧 Workaround: rebuild dependency tree on Linux
-      - name: Install deps (regenerate lockfile)
-        run: |
-          rm -f package-lock.json
-          rm -rf node_modules
-          npm i
+      # Show npm version for sanity
+      - name: Print npm version
+        run: npm -v
+
+      # Install using the lockfile + include optionals
+      - name: Install deps
+        run: npm ci --include=optional
 
       - name: Build
         run: npm run build
