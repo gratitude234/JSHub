@@ -185,7 +185,7 @@
         <div class="text-[14px] font-semibold text-[#003F7F] mb-0.5">Got Feedback?</div>
         <div class="text-[13px] text-gray-600 mb-2">Help improve JABU MARKET.</div>
         <div class="inline-flex items-center gap-2 rounded-xl bg-[#003F7F] px-4 py-2 text-white text-[13px] font-semibold">
-          💬 Chat on WhatsApp
+          💬 Chat on WhatsAppp
         </div>
       </a>
     </section>
