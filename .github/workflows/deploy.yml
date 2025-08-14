@@ -2,7 +2,7 @@ name: Build & Deploy to Truehost
 
 on:
   push:
-    branches: [ main ]   # change if you deploy from another branch
+    branches: [ main ]
 
 jobs:
   build-and-deploy:
@@ -19,23 +19,27 @@ jobs:
           cache: 'npm'
 
       - name: Install deps
-        run: npm ci    # use "npm i" if you don't have package-lock.json
+        run: npm ci
 
       - name: Build
         run: npm run build
 
       - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps                # explicit FTPS (port 21)
-          local-dir: dist/              # Vite's default output
-          server-dir: public_html/      # CHANGE if your Document Root is different
+          protocol: ftps
+          local-dir: dist/
+          server-dir: public_html/   # change if your docroot is different
           log-level: standard
-          # Optional: keep non-app folders on the server (won't delete these)
           exclude: |
             logs/**
             backups/**
             tmp/**
+            cgi-bin/**
+            api/**
+            vendor/**
+            composer.json
+            composer.lock
